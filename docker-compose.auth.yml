@@ -1,0 +1,12 @@
+services:
+  auth:
+    build:
+      context: .
+      dockerfile: Dockerfile.auth
+    container_name: telegram-auth
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    stdin_open: true
+    tty: true

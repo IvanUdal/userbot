@@ -1,0 +1,13 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Копируем только необходимые файлы
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# Копируем скрипт аутентификации
+COPY auth_interactive.py .
+
+# Команда по умолчанию - ничего не запускать
+CMD ["python", "-c", "print('Ready for authentication')"]

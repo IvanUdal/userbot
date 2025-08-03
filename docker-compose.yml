@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   telegram-userbot:
     build: .
@@ -11,10 +9,10 @@ services:
       - ./data:/app/data
       - ./logs:/app/logs
       - ./sessions:/app/sessions
-      - ./.env:/app/.env:ro  # Используем ваш правильный .env файл
-      # - ./session_string.txt:/app/session_string.txt:ro  # Монтируем строку сессии (опционально)
+      - ./.env:/app/.env:ro
+      - ./session_string.txt:/app/session_string.txt:ro  # Монтируем строку сессии
     
-    # Переменные окружения (без секретных данных)
+    # Переменные окружения
     environment:
       - TZ=Europe/Moscow
       - PYTHONUNBUFFERED=1
@@ -36,26 +34,13 @@ services:
         max-size: "10m"
         max-file: "3"
     
-    # Сеть (опционально)
+    # Сеть
     networks:
       - userbot-network
     
-    # Команда для запуска (используем основной скрипт)
+    # Команда для запуска
     command: python main_pipeline.py
-
-  # Опциональный сервис для мониторинга (если нужен)
-  # monitoring:
-  #   image: nginx:alpine
-  #   container_name: userbot-monitoring
-  #   ports:
-  #     - "8080:80"
-  #   volumes:
-  #     - ./monitoring:/usr/share/nginx/html
-  #   depends_on:
-  #     - telegram-userbot
-  #   networks:
-  #     - userbot-network
 
 networks:
   userbot-network:
-    driver: bridge 
+    driver: bridge
