@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  telegram-userbot:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: telegram-userbot-prod
+    restart: unless-stopped
+    
+    # Монтируем volumes для продакшена
+    volumes:
+      - userbot_data:/app/data
+      - userbot_logs:/app/logs
+      - userbot_sessions:/app/sessions
+      - ./.env:/app/.env:ro
+    
+    # Переменные окружения для продакшена
+    environment:
+      - TZ=Europe/Moscow
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+    
+    # Ограничения ресурсов для продакшена
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    
+    # Настройки логирования для продакшена
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+    
+    # Сеть
+    networks:
+      - userbot-network
+    
+    # Команда запуска
+    command: python main.py
+    
+    # Проверка здоровья
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8080/health', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Опциональный сервис для мониторинга
+  monitoring:
+    image: nginx:alpine
+    container_name: userbot-monitoring
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./monitoring:/usr/share/nginx/html:ro
+    depends_on:
+      - telegram-userbot
+    networks:
+      - userbot-network
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.1'
+
+  # Опциональный сервис для бэкапов
+  backup:
+    image: alpine:latest
+    container_name: userbot-backup
+    restart: "no"
+    volumes:
+      - userbot_data:/data:ro
+      - ./backups:/backups
+    command: |
+      sh -c "
+        tar -czf /backups/userbot_data_$(date +%Y%m%d_%H%M%S).tar.gz -C /data .
+        echo 'Backup completed'
+      "
+    networks:
+      - userbot-network
+
+volumes:
+  userbot_data:
+    driver: local
+  userbot_logs:
+    driver: local
+  userbot_sessions:
+    driver: local
+
+networks:
+  userbot-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16 

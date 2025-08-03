@@ -1,0 +1,150 @@
+{
+  "pipelines": {
+    "news_analytics": {
+      "name": "Аналитика новостей",
+      "enabled": true,
+      "source": "news_channel",
+      "destinations": ["analytics_db", "notification_channel"],
+      "processing_steps": [
+        {
+          "name": "text_analysis",
+          "type": "nlp",
+          "config": {
+            "extract_entities": true,
+            "sentiment_analysis": true,
+            "keyword_extraction": true
+          }
+        },
+        {
+          "name": "content_filtering",
+          "type": "filter",
+          "config": {
+            "remove_duplicates": true,
+            "spam_detection": true,
+            "quality_score": 0.7
+          }
+        },
+        {
+          "name": "formatting",
+          "type": "formatter",
+          "config": {
+            "add_timestamps": true,
+            "add_source_info": true,
+            "normalize_text": true
+          }
+        }
+      ],
+      "created_at": "2024-01-01T00:00:00",
+      "last_run": null,
+      "total_processed": 0,
+      "total_errors": 0
+    },
+    "support_monitoring": {
+      "name": "Мониторинг поддержки",
+      "enabled": true,
+      "source": "support_group",
+      "destinations": ["analytics_db", "export_file"],
+      "processing_steps": [
+        {
+          "name": "priority_detection",
+          "type": "classifier",
+          "config": {
+            "urgency_keywords": ["срочно", "критично"],
+            "priority_levels": ["low", "medium", "high", "critical"]
+          }
+        },
+        {
+          "name": "response_tracking",
+          "type": "tracker",
+          "config": {
+            "track_responses": true,
+            "response_timeout": 3600
+          }
+        }
+      ],
+      "created_at": "2024-01-01T00:00:00",
+      "last_run": null,
+      "total_processed": 0,
+      "total_errors": 0
+    },
+    "tech_community_analysis": {
+      "name": "Анализ технического сообщества",
+      "enabled": true,
+      "source": "tech_community",
+      "destinations": ["elasticsearch", "webhook_endpoint"],
+      "processing_steps": [
+        {
+          "name": "technical_classification",
+          "type": "classifier",
+          "config": {
+            "tech_keywords": ["python", "javascript", "docker", "kubernetes"],
+            "categories": ["backend", "frontend", "devops", "mobile"]
+          }
+        },
+        {
+          "name": "expertise_detection",
+          "type": "analyzer",
+          "config": {
+            "detect_expertise_level": true,
+            "identify_questions": true,
+            "find_solutions": true
+          }
+        },
+        {
+          "name": "engagement_analysis",
+          "type": "analyzer",
+          "config": {
+            "measure_engagement": true,
+            "track_discussions": true,
+            "identify_trends": true
+          }
+        }
+      ],
+      "created_at": "2024-01-01T00:00:00",
+      "last_run": null,
+      "total_processed": 0,
+      "total_errors": 0
+    },
+    "comprehensive_monitoring": {
+      "name": "Комплексный мониторинг",
+      "enabled": true,
+      "source": "news_channel",
+      "destinations": ["analytics_db", "elasticsearch", "notification_channel", "export_file"],
+      "processing_steps": [
+        {
+          "name": "comprehensive_filtering",
+          "type": "filter",
+          "config": {
+            "keywords": ["важно", "срочно", "новости"],
+            "exclude_keywords": ["спам", "реклама"],
+            "min_length": 20
+          }
+        },
+        {
+          "name": "advanced_analysis",
+          "type": "analyzer",
+          "config": {
+            "sentiment_analysis": true,
+            "entity_extraction": true,
+            "topic_modeling": true,
+            "language_detection": true
+          }
+        },
+        {
+          "name": "enrichment",
+          "type": "enricher",
+          "config": {
+            "add_metadata": true,
+            "add_timestamps": true,
+            "add_source_info": true,
+            "add_processing_info": true
+          }
+        }
+      ],
+      "created_at": "2024-01-01T00:00:00",
+      "last_run": null,
+      "total_processed": 0,
+      "total_errors": 0
+    }
+  }
+} 

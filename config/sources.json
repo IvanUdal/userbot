@@ -1,0 +1,64 @@
+{
+  "sources": {
+    "news_channel": {
+      "id": -1001234567890,
+      "name": "Новостной канал",
+      "type": "channel",
+      "enabled": true,
+      "parsing_rules": {
+        "parse_text": true,
+        "parse_media": true,
+        "parse_buttons": true,
+        "parse_bots": false
+      },
+      "filters": {
+        "keywords": ["новости", "анонс"],
+        "exclude_keywords": ["спам"],
+        "min_length": 10
+      },
+      "last_activity": null,
+      "message_count": 0,
+      "error_count": 0
+    },
+    "support_group": {
+      "id": -1009876543210,
+      "name": "Группа поддержки",
+      "type": "group",
+      "enabled": true,
+      "parsing_rules": {
+        "parse_text": true,
+        "parse_media": true,
+        "parse_buttons": true,
+        "parse_bots": true
+      },
+      "filters": {
+        "keywords": ["помощь", "вопрос"],
+        "exclude_keywords": [],
+        "min_length": 5
+      },
+      "last_activity": null,
+      "message_count": 0,
+      "error_count": 0
+    },
+    "tech_community": {
+      "id": -100111222333,
+      "name": "Техническое сообщество",
+      "type": "supergroup",
+      "enabled": true,
+      "parsing_rules": {
+        "parse_text": true,
+        "parse_media": true,
+        "parse_buttons": true,
+        "parse_bots": true
+      },
+      "filters": {
+        "keywords": ["python", "telegram", "bot"],
+        "exclude_keywords": ["спам", "реклама"],
+        "min_length": 15
+      },
+      "last_activity": null,
+      "message_count": 0,
+      "error_count": 0
+    }
+  }
+} 

@@ -1,0 +1,95 @@
+{
+  "destinations": {
+    "analytics_db": {
+      "name": "База аналитики",
+      "type": "database",
+      "enabled": true,
+      "config": {
+        "connection_string": "postgresql://user:pass@localhost/analytics",
+        "table": "parsed_messages"
+      },
+      "processing_rules": {
+        "anonymize": true,
+        "aggregate": true,
+        "index": true
+      },
+      "success_count": 0,
+      "error_count": 0,
+      "last_success": null
+    },
+    "notification_channel": {
+      "name": "Канал уведомлений",
+      "type": "telegram",
+      "enabled": true,
+      "config": {
+        "chat_id": -100111222333,
+        "format": "markdown"
+      },
+      "processing_rules": {
+        "summarize": true,
+        "highlight_keywords": true,
+        "add_metadata": true
+      },
+      "success_count": 0,
+      "error_count": 0,
+      "last_success": null
+    },
+    "export_file": {
+      "name": "Экспорт в файл",
+      "type": "file",
+      "enabled": true,
+      "config": {
+        "format": "json",
+        "path": "./data/exports/",
+        "rotation": "daily"
+      },
+      "processing_rules": {
+        "compress": true,
+        "backup": true
+      },
+      "success_count": 0,
+      "error_count": 0,
+      "last_success": null
+    },
+    "webhook_endpoint": {
+      "name": "Webhook API",
+      "type": "webhook",
+      "enabled": true,
+      "config": {
+        "url": "https://api.example.com/webhook",
+        "method": "POST",
+        "headers": {
+          "Authorization": "Bearer token123",
+          "Content-Type": "application/json"
+        }
+      },
+      "processing_rules": {
+        "retry_on_failure": true,
+        "max_retries": 3,
+        "timeout": 30
+      },
+      "success_count": 0,
+      "error_count": 0,
+      "last_success": null
+    },
+    "elasticsearch": {
+      "name": "Elasticsearch",
+      "type": "elasticsearch",
+      "enabled": true,
+      "config": {
+        "hosts": ["localhost:9200"],
+        "index": "telegram_messages",
+        "username": "elastic",
+        "password": "password"
+      },
+      "processing_rules": {
+        "index_text": true,
+        "analyze_sentiment": true,
+        "extract_entities": true
+      },
+      "success_count": 0,
+      "error_count": 0,
+      "last_success": null
+    }
+  }
+} 

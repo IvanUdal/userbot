@@ -1,0 +1,148 @@
+version: '3.8'
+
+services:
+  telegram-userbot:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: telegram-userbot-dev
+    restart: unless-stopped
+    
+    # Монтируем volumes для разработки
+    volumes:
+      - .:/app  # Монтируем весь проект для hot reload
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./sessions:/app/sessions
+      - ./.env:/app/.env:ro
+    
+    # Переменные окружения для разработки
+    environment:
+      - TZ=Europe/Moscow
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - DEBUG=true
+      - LOG_LEVEL=DEBUG
+    
+    # Настройки ресурсов для разработки
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    
+    # Настройки логирования для разработки
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "10"
+    
+    # Сеть
+    networks:
+      - userbot-network
+    
+    # Команда запуска с отладкой
+    command: python main.py
+    
+    # Порты для отладки
+    ports:
+      - "8080:8080"  # Для веб-интерфейса (если есть)
+      - "5678:5678"  # Для debugger
+
+  # Сервис для разработки - Jupyter Notebook
+  jupyter:
+    image: jupyter/datascience-notebook:latest
+    container_name: userbot-jupyter
+    restart: unless-stopped
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./data:/home/jovyan/data
+      - ./notebooks:/home/jovyan/work
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    networks:
+      - userbot-network
+    depends_on:
+      - telegram-userbot
+
+  # Сервис для анализа данных - Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: userbot-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - userbot-network
+
+  # Сервис для баз данных - PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: userbot-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=userbot
+      - POSTGRES_USER=userbot
+      - POSTGRES_PASSWORD=userbot_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - userbot-network
+
+  # Сервис для кэширования - Redis
+  redis:
+    image: redis:7-alpine
+    container_name: userbot-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - userbot-network
+
+  # Сервис для мониторинга - Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: userbot-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - userbot-network
+
+volumes:
+  grafana_data:
+    driver: local
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+
+networks:
+  userbot-network:
+    driver: bridge 
